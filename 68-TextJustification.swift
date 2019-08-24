@@ -39,29 +39,35 @@
 //              Note that the second line is also left-justified becase it contains only one word.
 
 func fullJustify(_ words: [String], _ maxWidth: Int) -> [String] {
-    var myWords = words
+    var mWords = words
     var result = [String]()
-    while myWords.count > 0 {
-        // gather words in a line
-        var line = [String]()
-        var lineCount = 0
-        while let word = myWords.first, word.count + lineCount + line.count <= maxWidth {
+    while mWords.count > 0 {
+
+        /// Gather words in a line
+        var line = [String]()   // words in the line
+        var lineCount = 0   // total character count in the line
+
+        // character count in the line + 1 space between each word <= max line width
+        while let word = mWords.first, word.count + lineCount + line.count <= maxWidth {
             line.append(word)
             lineCount += word.count
-            myWords.removeFirst()
+            mWords.removeFirst()
         }
         
-        // process line
-        if myWords.count == 0 || line.count == 1 {   // special case. left justified
+        /// Process line
+        if mWords.count == 0 || line.count == 1 {   
+            // last line or line with sigle word. left justified
             var lineString = line.joined(separator: " ")
             lineString += String(repeating: " ", count: maxWidth - lineCount - (line.count - 1))
             result.append(lineString)
-        } else {    // fully justified. line has at least 2 words
+        } else {
+            // fully justified. line has at least 2 words
             let numOfSpace = maxWidth - lineCount
             let gap = String(repeating: " ", count: (numOfSpace) / (line.count - 1))
-            let prefixSize = numOfSpace % (line.count - 1)  // if space can't be even then gaps in prefix can have an additional space
+
+            // !!! If space can't be even then gaps in prefix can have an additional space
+            let prefixSize = numOfSpace % (line.count - 1)  
             let linePrefix = line[0...prefixSize].joined(separator: gap + " ")
-            let lastSpaceCount = maxWidth - linePrefix.count - line[line.count - 1].count
             let lineString = linePrefix + gap + line[prefixSize + 1...line.count - 1].joined(separator: gap)
             result.append(lineString)
         }
