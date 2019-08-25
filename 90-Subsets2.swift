@@ -15,6 +15,36 @@
 //   []
 // ]
 
+
+/// Recursion
+func subsetsWithDup(_ nums: [Int]) -> [[Int]] {
+    return subsets(nums.sorted())
+}
+
+func subsets(_ nums: [Int]) -> [[Int]] {
+    if nums.count == 0 {
+        return [[]]
+    }
+    var mNums = nums
+    var prefix = [mNums.removeFirst()]
+    while let first = mNums.first, first == prefix.first! {
+        prefix.append(first)
+        mNums.removeFirst()
+    }
+    
+    let restResult = subsets(mNums)
+    var result = restResult
+    // for this prefix of the same number, 
+    // add 0, 1, 2, ..., all of the same number to solution
+    for i in 1 ... prefix.count {
+        result += restResult.map { [Int](prefix.prefix(i)) + $0 }
+    }
+
+    return result
+}
+
+
+/// Iteration
 func subsetsWithDup(_ nums: [Int]) -> [[Int]] {
     var sortedNums = nums.sorted()
     var result = [[Int]()]

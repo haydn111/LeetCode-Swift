@@ -34,7 +34,56 @@
 // Explanation: The endWord "cog" is not in wordList, therefore no possible transformation.
 
 let letters = "abcdefghijklmnopqrstuvwxyz"
-    
+
+/// Unidirectional solution: TLE
+func ladderLength(_ beginWord: String, _ endWord: String, _ wordList: [String]) -> Int {
+    if !wordList.contains(endWord) { return 0 }
+    var wordSet = Set(wordList)
+    // var visited = Set<String>()
+
+    // [s: (length of shortest path from begin to s, prev string in shortest path)]
+    var path = [beginWord: (1, "")]    
+    var queue = [beginWord]
+
+    while queue.count > 0 {
+        let word = queue.removeFirst()
+        // visited.insert(word)
+        wordSet.remove(word)
+        if endWord == word { 
+            let (length, _) = path[word]!
+            return length
+        }
+        
+        // build neighbors
+        var neighbors = [String]()
+        for i in 0..<word.count {
+            for letter in letters {
+                var w = Array(word)
+                if w[i] != letter {
+                    w[i] = letter
+                    if wordSet.contains(String(w)) { 
+                        neighbors.append(String(w)) 
+                    }
+                }
+            }
+        }
+
+        for neighbor in neighbors {
+                queue.append(neighbor) 
+                let (currLen, _) = path[word]!
+                if let (nextLen, _) = path[neighbor] {
+                    if currLen + 1 < nextLen { 
+                        path[neighbor] = (currLen + 1, word) 
+                    }
+                } else {
+                    path[neighbor] = (currLen + 1, word)
+                }
+        }
+    }
+    return 0
+}
+
+
 // Optimized solution: 
 // - Only build the neighbors for current word
 // - Remove word from wordList once visited
@@ -46,7 +95,9 @@ func ladderLength(_ beginWord: String, _ endWord: String, _ wordList: [String]) 
     var endWords = [endWord, beginWord]
     var wordSet = [ws, ws]
     var visited = [Set<String>(), Set<String>()]
-    var path = [ [beginWord: (1, "")], [endWord: (1, "")] ]    // [s: (length of shortest path from begin to s, prev string in shortest path)]
+
+    // [s: (length of shortest path from begin to s, prev string in shortest path)]
+    var path = [ [beginWord: (1, "")], [endWord: (1, "")] ]
     var queue = [[beginWord], [endWord]]
 
     while queue[0].count > 0 && queue[1].count > 0 {
@@ -75,7 +126,9 @@ func ladderLength(_ beginWord: String, _ endWord: String, _ wordList: [String]) 
                     var w = Array(word)
                     if w[i] != letter {
                         w[i] = letter
-                        if wordSet[k].contains(String(w)) { neighbors.append(String(w)) }
+                        if wordSet[k].contains(String(w)) { 
+                            neighbors.append(String(w)) 
+                        }
                     }
                 }
             }
@@ -84,7 +137,9 @@ func ladderLength(_ beginWord: String, _ endWord: String, _ wordList: [String]) 
                     queue[k].append(neighbor) 
                     let (currLen, _) = path[k][word]!
                     if let (nextLen, _) = path[k][neighbor] {
-                        if currLen + 1 < nextLen { path[k][neighbor] = (currLen + 1, word) }
+                        if currLen + 1 < nextLen { 
+                            path[k][neighbor] = (currLen + 1, word) 
+                        }
                     } else {
                         path[k][neighbor] = (currLen + 1, word)
                     }

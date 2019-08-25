@@ -21,11 +21,10 @@ func removeDuplicates(_ nums: inout [Int]) -> Int {
     var curr = 0, offset = 0
     while curr + offset < nums.count {
         nums[curr] = nums[curr + offset]
-        var ptr1 = curr + offset + 1
-        var ptr2 = curr + offset + 2
-        while ptr1 < nums.count && ptr2 < nums.count && nums[ptr1] == nums[curr + offset] && nums[ptr2] == nums[curr + offset] {
+        while curr + offset + 2 < nums.count && 
+              nums[curr + offset + 1] == nums[curr + offset] && 
+              nums[curr + offset + 2] == nums[curr + offset] {
             offset += 1
-            ptr1 += 1; ptr2 += 1
         }
         curr += 1
     }

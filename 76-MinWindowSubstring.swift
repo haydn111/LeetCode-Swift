@@ -15,13 +15,13 @@ func minWindow(_ s: String, _ t: String) -> String {
         return ""
     }
     
-    let sArray = Array(s)
-    let tArray = Array(t)
+    let s = Array(s)
+    let t = Array(t)
     
     var tDict = emptyCharacterDictionary()
     var sWindowDict = emptyCharacterDictionary()
     
-    for char in tArray {
+    for char in t {
         tDict[char]! += 1
     }
     
@@ -37,7 +37,7 @@ func minWindow(_ s: String, _ t: String) -> String {
                 break
             }
             
-            let charAtRInS = sArray[r]
+            let charAtRInS = s[r]
             sWindowDict[charAtRInS]! += 1
 
             let numOfThisCharInT = tDict[charAtRInS]!
@@ -53,7 +53,7 @@ func minWindow(_ s: String, _ t: String) -> String {
             }
             
             // move left ptr
-            let charAtLInS = sArray[l]
+            let charAtLInS = s[l]
             sWindowDict[charAtLInS]! -= 1
 
             let numOfThisCharInT = tDict[charAtLInS]!
@@ -64,11 +64,10 @@ func minWindow(_ s: String, _ t: String) -> String {
             
             l += 1
         }
-        print ("l = \(l), r = \(r), count = \(count)")
     }
     
     if resultL >= 0 && resultR >= 0 {
-        return String(sArray[resultL...resultR])
+        return String(s[resultL...resultR])
     }
     return ""
 }
