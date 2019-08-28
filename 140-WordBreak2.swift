@@ -62,23 +62,36 @@ class Solution {
     }
     
     // dfs solution
-    var dict = [String: [String]]() // use dict to remember the solution found before
+    var wordSet = Set<String>()
+    var cachedSolutions = [String: [String]]()
+    
     func wordBreak(_ s: String, _ wordDict: [String]) -> [String] {
-        if s.count == 0 { return [] }
-        if dict[s] != nil { return dict[s]! }
+        wordSet = Set(wordDict)
+        return breakWord(s)
+    }
+
+    func breakWord(_ s: String) -> [String] {
+        let length = s.count
+        if length == 0 { return [""] }
+        if let cachedSolution = cachedSolutions[s] { 
+            return cachedSolution 
+        }
+        
         var solution = [String]()
-        for i in 0..<s.count {
-            if wordDict.contains(String(s[0...i])) {
-                if i < s.count - 1 {
-                    let partialSolution = wordBreak(String(s[i + 1...s.count - 1]), wordDict)
-                    dict[String(s[i + 1...s.count - 1])] = partialSolution
-                    solution += partialSolution.map { s[0...i] + " " + $0 }
-                } else {    // dict contains s itself
-                    solution += [s]
+        for i in 1 ... length {
+            let prefix = String(s.prefix(i))    
+            if wordSet.contains(prefix) {
+                let partialSolution = breakWord(String(s.suffix(length - i)))
+                solution += partialSolution.map { 
+                    if $0.isEmpty {
+                        return prefix
+                    } else {
+                        return "\(prefix) \($0)"
+                    }
                 }
             }
         }
-        dict[s] = solution
+        cachedSolutions[s] = solution
         return solution
     }
 
