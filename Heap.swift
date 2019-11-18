@@ -1,13 +1,6 @@
 import Foundation
 
-class HeapNode {
-    var val: Int
-    init(_ val: Int) {
-        self.val = val
-    }
-}
-
-class MinHeap {
+class MinHeap<HeapNode: Comparable> {
     var nums = [HeapNode]()
     var count: Int {
         return nums.count
@@ -17,7 +10,7 @@ class MinHeap {
         nums.append(n)
         // shift up
         var i = nums.count - 1
-        while let parent = parent(of: i), nums[parent].val > n.val {
+        while let parent = parent(of: i), nums[parent] > n {
             nums.swapAt(i, parent)
             i = parent
         }
@@ -31,10 +24,10 @@ class MinHeap {
         var i = 0
         var left = leftChild(of: i)
         var right = rightChild(of: i)
-        while (left != nil && nums[i].val > nums[left!].val) || 
-                (right != nil && nums[i].val > nums[right!].val) {
-            var min = minChild(left, right)!
-            nums.swapAt(i, min) 
+        while (left != nil && nums[i] > nums[left!]) ||
+              (right != nil && nums[i] > nums[right!]) {
+            let min = minChild(left, right)!
+            nums.swapAt(i, min)
             i = min
             left = leftChild(of: i)
             right = rightChild(of: i)
@@ -52,17 +45,17 @@ class MinHeap {
     
     private func rightChild(of i: Int) -> Int? {
         return 2 * i + 2 < nums.count ? 2 * i + 2 : nil
-    }  
+    }
     
     private func minChild(_ i1: Int?, _ i2: Int?) -> Int? {
-        if i1 == nil { return i2 }
-        if i2 == nil { return i1 }
-        return nums[i1!].val < nums[i2!].val ? i1! : i2!
+        guard let i1 = i1 else { return i2 }
+        guard let i2 = i2 else { return i1 }
+        return nums[i1] < nums[i2] ? i1 : i2
     }
 }
 
-var array = [99, 82, 81, 25, 33, 14, 10]
+let array = [99, 82, 81, 25, 33, 14, 10]
 let myHeap = MinHeap(with: array)
-print(myHeap.heap)
-myHeap.remove(10)
-print(myHeap.heap)
+print(myHeap.nums)
+print(myHeap.removeMin() ?? -1)
+print(myHeap.nums)

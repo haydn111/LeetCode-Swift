@@ -12,6 +12,7 @@
 
 // 思路:首先对数组进行排序. 然后同样是先确定一位, 然后双指针一个在最左边, 一个在最右边. 如果三个数的和小于target, 也就是nums[i]+nums[left]+nums[right] < target, 那么nums[i]+nums[left]+在区间[left+1, right-1]之间的所有数一定<target, 因为这个区间的数都小于nums[right], 所以一次可以得到几个组合方式, 也就是right-left个答案. 然后再让left++, 继续做即可. 注意到这个之后就可以很容易得到答案. 时间复杂度O(N^2).
 // E.g. in [-2, 0, 1, 3], if [-2, 0, 3] < target then  [-2, 0, 1] also < target
+
 func threeSumSmaller(_ nums: [Int], _ target: Int) -> Int {
     var sorted = nums.sorted()
     var i = 0, count = 0

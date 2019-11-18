@@ -20,7 +20,7 @@ Note: you can assume that no duplicate edges will appear in edges. Since all edg
 // Solution:
 //     Directed graph:
 //         1. (Build graph and) Find root (outgoing only edge). If there is more than one root, fail.
-//         2. Cycle detection with DFS. If there is cycle, fail.
+//         2. Cycle detection with DFS. If there is cycle, fail. Pay attention to push and pop visited nodes.
 //         3. After traversal if there is any unvisited nodes (not connected), fail.
 
 //     Undirected graph: (Identify root is generally impossible)

@@ -14,9 +14,11 @@
 //   [18, 21, 23, 26, 30]
 // ]
 // Given target = 5, return true.
-
 // Given target = 20, return false.
 
+
+// Search in sorted matrix (binary search)
+// For each row, if target can be in this row, do a binary search.
 func searchMatrix(_ matrix: [[Int]], _ target: Int) -> Bool {
     if matrix.count == 0 || matrix[0].count == 0 { return false }
     for row in matrix {

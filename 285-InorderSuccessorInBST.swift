@@ -46,9 +46,6 @@ func inorder(_ r: BST?, _ p: Int) { // O(n) using inorder traversal
     inorder(r?.right, p)
 }
 
-// inorder(bst, 7)
-// print(succ)
-
 func inorder2(_ r: BST?, _ p: Int) { // O(logn) using inorder traversal and bst property
     if r == nil { return }
     if p < r!.value {
@@ -60,5 +57,6 @@ func inorder2(_ r: BST?, _ p: Int) { // O(logn) using inorder traversal and bst 
         inorder(r?.right, p)
     }
 }
+
 inorder2(bst, 7)
 print(succ)

@@ -1,17 +1,27 @@
 // Convert a non-negative integer to its english words representation. Given input is guaranteed to be less than 231 - 1.
 
 // Example 1:
-
 // Input: 123
 // Output: "One Hundred Twenty Three"
-// Example 2:
 
+// Example 2:
 // Input: 12345
 // Output: "Twelve Thousand Three Hundred Forty Five"
-// Example 3:
 
+// Example 3:
 // Input: 1234567
 // Output: "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+
+/*
+Have arrays for words of below 20, tens and thousands. 
+
+Build a util function turn a three or less digit number into words. Pay attention the last two digits could be below or above twenty.
+
+Result string = prefix + separator + infix + separator + suffix
+suffix = correct word in thousands array
+infix = words of n % 1000 (last three digits)
+prefix = words of n / 1000 (without last three digits)
+*/
 
 class Solution {
     let below20 = "Zero One Two Three Four Five Six Seven Eight Nine Ten Eleven Twelve Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen".split(separator: " ")

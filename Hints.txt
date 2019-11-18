@@ -1,0 +1,1200 @@
+- Non Leetcode Problems
+
+Find the row with maximum number of 1s
+    Given a boolean 2D array, where each row is sorted. Find the row with the maximum number of 1s.
+
+    Example
+    Input matrix
+    0 1 1 1
+    0 0 1 1
+    1 1 1 1  // this row has maximum 1s
+    0 0 0 0
+
+    Output: 2
+
+    Hint: Do a binary search to find the index of first 1 on each line. Then # of 1's on that line = # of columns - index of first 1
+
+BST to sorted doubly linked list
+    Hint: For each node, it's list = list of left subtree + node + list of right subtree. Needs to know the head and tail of each subtree to build the new list.
+
+Graph shortest path
+    Use dijkstra's algorithm. First init the distances to all nodes to infinity. Then bfs go thru each node, update the shortest distance to each node and the prev node along the shortest path to that node. Stop when found the other end. Then backtrace the get the path.
+    
+    If the graph is acyclic, it's equivalent to a BFS. Use a queue to store neighbor nodes. => O(E + V)
+    If the graph has cycle, we need to use a priority queue to store neighbors. Each time dequeue the node with smallest total distance from the starting node. =? O(E + VlogV)
+
+Quick sort
+    get the pivot by partition => recursively sort left and right sublists
+
+    partition: 
+        pick the last number as pivot, init pivotIndex to first element
+        go thru each element. if it's smaller than pivot, swap it and the pivotIndex, pivotIndex++
+        swap pivotIndex and the last number, put pivot into the right place.
+        return pivot index
+
+Quick select (kth largest / smallest element)
+    get the pivotIndex by partition
+    if pivotIndex == k, return number at pivotIndex
+    if pivotIndex > k, recursively do same thing for right half of the list
+    if pivotIndex < k, recursively do same thing for left half of the list
+
+========================================================================================
+
+- Data Structures
+
+Heap
+    parent of i = (i + 1) / 2, left child = 2i + 1, right child = 2i + 2
+    insert: append to last then do shiftUp() => keep swapping element and it's parent until heap order is fulfilled.
+    deleteMin: swap first and last element. remove last. Then do shiftDown() from root => swap root with it's smaller (min heap) children
+
+Trie
+    A prefix tree with each node points to its parent. Root is a dummy node without any character. Parent of root is nil.
+        class TrieNode {
+            var value: Character
+            var parent: TrieNode?
+            var children: [Character: TrieNode]
+            var isTerminate: Bool
+        }
+
+    insert: traverse and add node if not exist. set the terminate flag on the last node to true.
+
+    contains/find: traverse the trie. If any of the node in the middle is missing, or the last node is not a terminating node. Return false.
+
+    remove: first traverse to the last node. then backtrack to remove, until following conditions
+        while curr.isLeaf() && !curr.isTerminate, let parent = curr.parent {
+            parent.children[curr.value] = nil
+            curr = parent
+        }
+    
+========================================================================================
+
+- Leetcode Problems
+
+Index
+- Strings
+- Search
+- Tree and graph
+- Sort
+- Linked list
+- Sum
+- DP
+
+398 - Random Pick Index: randomly pick one out of many target number instances from the array.
+    For every target found, increase count by 1, then test random(count) == 0. If true then use the target at current index. Otherwise keep the old index. Both options has the chance of 1 / count
+
+525 - Contiguous Array
+    Have a count variable. count -= 1 when see a 0, count += 1 when see a 1. If count == 0 or we see the same count twice, means there is a substring with equal # of 0s and 1s.
+
+80 - Remove dups from sorted array 2: each number can appear at most twice.
+    Use one offset and two ptrs. Every time ptr1 = curr + offset + 1 and ptr2 = curr + offset + 2
+    Increasing the offset while nums[ptr1] == nums[curr + offset] && nums[ptr2] == nums[curr + offset]
+
+209 - Min size subarray sum >= s
+    Sliding window and record the smallest window size.
+
+----Strings-----------------------------------------------------------------
+
+28 - strStr(): find the first occurrence of substring.
+    Use a sliding window to scan thru the string.
+
+71 - Simplify path
+    Make use of split(separator:). "/" is separator. Ignore and "."s and removeLast when see and ".."
+
+76 - Min window substring: find min window in s that contains all chars in t
+    First process t, store count of each char in a dict
+    Then go thru s using two pointers. Always move to the next char that is in t.
+    When modifying the count of matching chars, keep in mind the window could have more instance of a char than it needs in t.
+
+125 - Validate palindrome
+    Only look at alphanumeric chars. Use left and right pointers to go thru alphanumeric chars from each side.
+
+680 - Validate palindrome 2: Check palindrome if you can delete at most one character. 
+    User pointers start from both ends. if s[l] != s[r], then check if s[i+1] == s[j] || s[i] == s[j-1] then check if one of s[l+1...j] || s[l...j-1] is a palindrome
+
+647 - Palindromic substrings
+    中心扩散, at each index check palindrome from (i, i) and (i, i + 1) for odd and even length of palindrome respectively.
+
+273 - Integer to english words
+    Have arrays for words of below 20, tens and thousands. 
+    
+    Build a util function turn a three or less digit number into words. Pay attention the last two digits could be below or above twenty.
+
+    Result string = prefix + separator + infix + separator + suffix
+    suffix = correct word in thousands array
+    infix = words of n % 1000 (last three digits)
+    prefix = words of n / 1000 (without last three digits)
+    
+68 - Text Justification
+    1. get words in a line: # of chars in words + at least 1 space between words <= line width
+    2. process line: 
+        Last line, or line has only 1 word => left justified with 1 space between words.
+        Fully justified: 
+            # of space between words = # of spaces in line / (# of words in line - 1)
+            first or last (# of space % (# of words - 1)) can get 1 extra space
+
+49 - Group anagrams
+    Use sorted word as the key, put anagrams into a dictionary
+
+636 - Exclusive time of functions
+    // n = 2
+    // logs = ["0:start:0",
+    //          "1:start:2",
+    //          "1:end:5",
+    //          "0:end:6"]
+    // Output:[3, 4]
+
+    Use a stack to record function start and end for nested functions.
+    Record previous time. To be consistent, start time doesn't count.
+    record prev state. end - start => time + 1, start - end => time - 1. Otherwise stay the same
+
+43 - Multiply strings
+    First design a util function that can multiplay a number (string) with a single digit (character) and an external carry (string) => n * d + c
+
+    Then use the util function to multiply two strings. In every iteration, insert the last digit into the result string, and put all digits before last one as the carry for next iteration.
+
+161 - Check if two strings are one edit distance from each other
+    One edit includes add, replace, delete. First check s, t length differs at most 1
+    Use two ptrs scan thru s and t from left and right. At some point 
+    if s[i] != t[j] {
+        set flag to true
+        if s.count == t.count { i++, j++ }    // s, t has one different char
+        else if s.count > t.count { i++ }   // s has an extra char
+        else { j++ }    // t has an extra char
+    } else { i++, j++ } // s[i] == t[j], compare next char
+
+168 - Excel sheet index: 26 -> Z, 27 -> AA ...
+    Convert given number to a base 26 number. The tricky part is that we need to use 1 - 26 instead of 0 - 25 to represent the base 26 number. => Use i - 1 during calculation.
+
+----Tree and graph---------------------------------------------------------
+
+297 - Serialize Deserialize binary tree
+    Serialize: level order traversal including the nulls under the leaf. Then remove the nulls at the end.
+    Deserialize: Build tree from an array. recursively call build tree on the child nodes.
+
+96 - Validate BST: all nodes in left subtree < root < all nodes in right subtree
+    Use a variation of findMinMax in a tree. During the process, for each node, check if lMax < root < rMin
+
+285 - Inorder successor in BST
+    Binary Tree:
+    User an external flag 'found'. Do inorder traversal. If the node is found, mark found to true. At next node check the found flag. Record the node if found is true.
+
+    BST:
+    while root != nil {
+        if root.val > target.val {
+            result = root; root = root.left
+        } else root = root.right
+    }
+
+236 - LCA of two nodes in binary tree
+    If root == nil or root == p or root == q, return root. Otherwise, recursively find p and q in left and right subtree. If found p, q in both left and right then root is LCA. If found both p, q in left/right then left/right is LCA. If both not found return nil
+
+543 - Diameter of binary tree
+    For any node, the max diameter = max path in its left subtree + max path in its right subtree. Recursively calculate max distance to leaf in left/right subtree at every node to find the max diameter.
+
+124 - Binary Tree max path sum: a path is formed by one or more node. find the max sum of all paths.
+    int maxPathDown(TreeNode node) {
+        if (node == null) return 0;
+        int left = Math.max(0, maxPathDown(node.left));
+        int right = Math.max(0, maxPathDown(node.right));
+        maxValue = Math.max(maxValue, left + right + node.val);
+        return Math.max(left, right) + node.val;
+    }
+
+133 - Clone undirected graph
+    First use bfs to clone all nodes. Build a dict of [orig_node: clone_node]. Then go thru each pair of nodes to build edges in cloned graph.
+
+261 - Graph valid tree: graph is a tree if it's connected and acyclic. Also, # of edge = # of nodes - 1.
+    Directed: Build graph and find root (only out going edges, should only get one.). Then perform cycle detection with dfs. Pay attention to push and pop visited nodes.
+
+    Undirected: Build graph. Then perform cycle detection with 'from' side of each edge. i.e. do not go to the neighbor where comes to the current node.
+
+721 - Accounts Merge: accounts can be merged if they share at least one common email.
+    1. Build graph of email: neighbor_emails. Only build for the first email in each accounts. E.g. email1 : (email2, email3), email2 : email1, email3 : email1
+    2. Perform BFS on each starting email. From one starting email we can go thru all connected emails. If a starting email is in visited set, means it's linked by another account and has already been traversed.
+
+127 - Word Ladder (bfs): find the length of shortest transformation sequence in wordList from beginWord to endWord. Only one letter can be changed at a time.
+    1. Turn input word list into a wordSet for better performance
+    2. Use a path dictionary [word: tuple(len of shortest path, prev word in shortest path)]
+    3. For each word, visited += word, wordSet -= word
+    4. If found the other end, return length
+    5. Build neighbors for each word by changing each char in word from a to z and test if changed word is in word set.
+    6. Enqueue each neighbor and update their length to currLength + 1 if it's less than their length.
+
+    7. Optimization: Start search from both end.
+
+----Search------------------------------------------------------------------
+
+42 - Trapping rain water
+    Use two ptrs l, r start from left and right. lMax, rMax be the max height so far from left/right
+    while l < r {
+        leftMax = max(leftMax, height[l])
+        rightMax = max(rightMax, height[r])
+        
+        if leftMax > rightMax {
+            trappedWater += rightMax - height[r]
+            r -= 1
+        } else {
+            trappedWater += leftMax - height[l]
+            l += 1
+        }
+    }
+    Think about how to explain!!!
+
+277 - Find Celebrity: Celebrity know nobody, everybody know celebrity
+    Let the first one be candidate of celebrity. Ask of candidate know each person. For each one he doesn't know, they cannot be celebrity. For the first one candidate knows, then he becomes the new candidate. Finally validate the candidate with everyone is celebrity or not.
+
+670 - Max swap
+    From LSB to MSB, have max, indexOfMax, swap1, swap2
+    if s[i] < max { swap1 = i, swap2 = indexOfMax }
+    else { max = s[i], indexOfMax = i }
+    Finally, swapAt(swap1, swap2)
+
+314 - BST Vertical Order traversal
+    Root is level 0, left/right child = parent level -/+ 1
+    Based on level order traversal. Queue should now store both tree nodes and its vertical level.
+
+    Use a dictionary [vertical_level: [nodes_at_level]]. Use two variables to store left right boundary levels. On dequeue, put node value into its level in dict.
+
+78 - Subsets: Find non duplicate subsets of an array with no dups
+    Standard subset problem. result += result.map { $0 + [curr] }
+
+90 - Subsets2: Find non duplicate subsets of an array with duplicate numbers
+    First sort the array. Then go thru the sorted array. For each batch of duplicated numbers, treat them as an special collection that may contains 1 to k of the same numbers.
+
+33 - Search in rotated sorted array (binary search)
+    E.g. find some # in [4,5,6,7,0,1,2]
+    First, find the pivot. if mid > high then low = mid + 1, else high = mid
+    Then find if target is in left or right half of the list. Then do another binary search on that half of list.
+
+50 - pow(x, n) (binary search)
+    n == 0 => 1
+    n < 0 => 1 / pow(x, -n)
+    if n % 2 == 0 { return myPow(x, n / 2) ^ 2 }
+    else { return x * myPow(x, n / 2) ^ 2 }
+
+69 - sqrt(x) (binary search)
+    low = 1, high = x. while low < high, check mid^2 < x and (mid + 1)^2 > x
+
+29 - Divide two integers (binary search)
+    First check the sign of result. Then do binary search to find the max k such that k * divisor < dividend: double the sum each time to see if its still less than dividend
+
+    func binaryDivide(_ d1: Int64, _ d2: Int64) -> Int64 {
+        if d1 < d2 { return 0 }
+        var sum = d2, count = Int64(1)
+        while sum + sum <= d1 {
+            sum += sum
+            count += count
+        }
+        return count + binaryDivide(d1 - sum, d2)        
+    }
+
+282 - Expression add operators: add +, - or * to between digits in a string to get the designated number. Print all possible expressions (dfs)
+    
+    dfs(expr: String, position: Int, prevResult: Int, result: Int)
+    prevResult is useful when there consecutive "*"s
+
+    Start from a position up to the end of string, currString = number[position...i]. Try put +, - or * before this substring and calculate result.
+
+    For multiply: dfs(expr: expr + "*" + currString, position: i + 1, prevResult: prevResult * currNum, result: result - prevResult + prevResult * currNum)
+
+301 - Remove invalid parentheses (dfs)
+    1st pass: mark how many left and right parentheses needs to remove: l + 1 for each left, l - 1 for each right, r + 1 for each right when l == 0
+    => needs to remove l left and r right to make it valid
+
+    from the head of string, start at each char: first recursively delete r right parentheses, then recursively delete l left parentheses. validate string when l == r == 0
+
+    if there's multiple of same parentheses in a row, only try delete the first one.
+
+210 - Course schedules 2 (dfs)
+    First build course dependency graph and find roots. Then trace back from final courses. 
+
+    Directed graph cycle detection: use dfs, store all nodes on the way to current node. 
+
+    Traverse dependency graph: first dfs all the way thru beginning nodes, then append each node into result during backtracking.
+    Check if all courses are visited. If there is a non-reachable course.
+
+40 - Combination Sum 2 (dfs): find all unique combinations sums to target. Use each number once.
+    First sort all the numbers. Then do dfs thru all numbers. During dfs, 1. only use each number once. 2. If there's duplicate numbers, use only first one.
+
+17 - Letter Combinations of a Phone Number
+    Do cartesian product for each letter
+
+200 - Number of islands (bfs)
+    Search each digit of the grid using nested for loops. If an 1 is found. Eat the island (turn all neighboring 1's to 0's) using bfs and increase the count
+
+128 - Longest consecutive subsequence
+    E.g. [100, 4, 200, 2, 1, 3] => 4 (1, 2, 3, 4)
+    Build a dictionary [num: length_of_consecutive_seq] and update two ends of the sequence. When we see a number k, look for k - 1 and k + 1 in the sequence. Also update two ends of this seq dict[k - dict[k - 1]] and dict[k + dict[k + 1]]. Record the max length.
+
+----Sort---------------------------------------------------------------
+
+253 - Meeting rooms 2 (Array, Sort)
+    Sort the rooms based on it's start time. Then look at each consecutive pair of rooms see if they overlap. Remove the ith room if ith and (i + 1)th room not overlap.
+
+56, 57 - Merge intervals
+    Sort intervals using there start value. Then compare one by one.
+
+218 - The skyline problem (look at code for O(nlogn)
+    Sort the building using their start point. Then go thru them and turn them into a list of non-overlapping buildings.
+    There are several case to consider:
+        if two buildings not overlap { go to next building }
+        else {
+            if budg1 contains budg2 {
+                if budg1 is higher than budg2 { remove budg2 }
+                else { split them into three buildings. Insert the thrid building into the appropriate position }
+            } else {
+                budg1 and budg2 has some overlap
+                if budg1 is higher than budg2 {
+                    insert new budg2 into correct place
+                } else {
+                    two new budgs in origial place.
+                } 
+            }
+        }
+    After done processing all budgs, add all the pts with different height into the result. Finally add the right bottom point as the end.
+
+554 - Brick wall: find the slot to pass thru that hits least bricks.
+    Maintain a dictionary for each slot to record # of seams on that slot. The slot with most seams win.
+
+334 - Increasing triplet subsequence: check if an array contains at least 3 increasing numbers
+    Keep two flags small and large. Update them when there's number smaller than them. If found a number greater than both of them than return true.
+
+75 - Sort colors
+    https://leetcode.com/problems/sort-colors/discuss/26500/Four-different-solutions 
+    look at second solution
+
+----Linked List------------------------------------------------------------
+
+148 - Sort list (merge sort)
+    Recursively sort two halves of list and merge them. Use slow and fast pointers method to find the mid of list.
+
+92 - Reverse linked list between m and n, 1 <= m <= n <= length of list
+    Reverse m...n to n...m
+    nodeBeforeM.next = n, m.next = nodeAfterN
+
+25 - Reverse linked list in k group
+    First validate if list have at least k nodes haven't been reversed. Then reverse the sublist and attach it the rest of the list.
+
+----Sum--------------------------------------------------------------------
+
+67 - Add Binary numbers a and b
+    from right to left, newBit, newCarry = bitInA + bitInB + carry
+    keep doing this until a, b empty and carry == 0
+
+15 - 3 sum O(n^2)
+    first sort the input array. for each unique number in array, use it as base. then find 2-sum on it's right. 
+
+    Use hash table to find 2-sum by storing all #s we have seen.
+
+325 - Max subarray of sum k
+    Build two dictionaries in first pass. sumDict = [sumOfArray[0...i]: i] and sums = [i: sumOfArray[0...i]]
+
+    In second pass, if sums[i] == k then sum of array[0...i] == k, length is i + 1. Or if there exist an m such that sumDict[m] + k = sumDict[i], then sum of array[m + 1...i] == k, length is i - m
+
+----DP--------------------------------------------------------------------
+
+494 - Target Sum: add + or - before each digit (including first digit) to get the target sum. How many ways to get target sum?
+    target sum = sum of positive subset - sum of negative subset
+    total sum = sum(P) + sum(N)
+    => sum(p) = (target sum + total sum) / 2
+    => # of ways to get a subset sum of (target sum + total sum) / 2
+    => see 416
+
+    Optimized version
+        dp[0] = 1
+        for n in nums {
+            if sum >= n {
+                for i in stride(from: sum, to: n - 1, by: -1) {
+                    dp[i] += dp[i - n]  // use n = dp[i - n], not use n = dp[i]
+                }
+            }
+        }
+
+416 - Partition Equal Subset sum: can a array be partition into two subsets where their sums are the same?
+    Two subsets, each has sum of (total sum / 2) => total sum must be even
+    
+    dp[i][j] = using nums[0...i] can form sum j or not
+    
+    init: dp[i][0] = true   // any subset of nums can get a sum of 0
+
+    if nums[i] > j {  dp[i][j] = dp[i - 1][j] }   // nums[i] cannot participate the subset since it's greater than the designated sum j
+    else { dp[i][j] = dp[i - 1][j] || dp[i - 1][j - nums[i]] }  // nums[0...i] has a subset sums to j if nums[0...i-1] has such subset, or nums[0...i-1] has the subset that sums to j - nums[i]
+
+    Finally return dp[nums.count - 1][total sum / 2]
+
+689 - Max sum of 3 non-overlapping subarrays of size k
+    4 passes. 
+    
+    1st pass: left to right, sumArray[i] = sum of array[i...i + k - 1]
+    2nd pass: left to right, leftMaxSum[i] = index of largest sum in first i + 1 subarrays 
+    3rd pass: right to left rightMaxSum[i] = index of largest sum found so far from right
+    4th pass: left to right, from k to (sumArray.count - 1) - k, sum at i = sumArray[leftMaxSums[i - k]] + sumArray[i] + sumArray[rightMaxSums[i + k]]
+
+10 - Regular Expr Matching (DP)
+    Related problem: 44
+    string s and p, p contains "." or "*". "a*" means 0 or more a's. return if s, p matches.
+
+    dp[i][j] = first i chars in s and first j chars in p matches or not.
+    init: dp[0][0] = true. dp[i][0] = false. 
+        dp[0][j] if current char in p is "*", then look at dp[0][j - 2]
+    func: 
+        if curr char in p is "*", look at the char before * in p
+            if curr char in s == char before * in p
+                dp[i][j] = dp[i - 1][j] || dp[i][j - 2]
+                        abcdd..., abcd* || abc, abcd*
+        else if current char in s == current char in p
+            if equal (curr char of p could be "."), dp[i][j] = dp[i - 1][j - 1]
+        else dp[i][j] = false
+    return: dp[i][j]
+
+516 - longest Palindromic subsequence (not substring) (DP)
+    dp[i][j] = length of longest subsequence in s[i...j]
+    init: dp[i][i] = 1, single characters are palindromes
+    progress: i from 0 to last, j from i - 1 to 0
+            if s[i] == s[j] { dp[i][j] = 2 + dp[i + 1][j - 1] } // e.g. axxxa
+            else { dp[i][j] = max(dp[i + 1][j], dp[i][j - 1]) } // e.g. axxxb, then look at axxx and xxxb
+
+139 - Word break: return if a word s can be broken into parts that are in dictionary.
+    dp[i] = if s[0...i] can be built with dictionary words.
+    init: dp = [false]
+    func: for j from i to 0, if s[j...i] in dict, then dp[i] = dp[j - 1]
+        special case is if j == 0 then dp[i] = dict contains s[j...i] or not
+
+140 - Word break 2: output all dict combinations of a word
+    DP solution (memory pressure): same as 139 word break 1, but the dp array becomes dp[i] = all dict representations of s[0...i]
+    DFS solution (preferred): 
+        for i in 0..<s.count {
+            if dict.contains(s[0...i]) { 
+                solution += partialSolution(s[i+1...count]).map { s[0...i] + $0 }
+        }    }
+
+377 - Combination sum 4. Find all combinations add up to a target. Numbers can be reused.
+    dp[i] = # of ways add up to i. dp.count = targe + 1
+    init: dp[i] = 0
+    prog: for each i, for each number, if number == i then dp[i] += 1. else dp[i] += dp[i - num]
+
+91 - Decode ways
+    dp[i] = # of decode ways for first i chars in s
+    dp[0] = 1
+    To progress for s[i - 1]
+        1. can be decoded only with previous digit: dp[i] = dp[i-2]
+        2. can be decoded only by itself: dp[i] = dp[i-1]
+        3. can be decoded in both ways: dp[i] = dp[i-1] + dp[i-2]
+
+238 - Product array except self
+    pre-process the array for 2 passes. leftProduct = [product of nums[0...i]], rightProduct = [product of nums[nums.count-1...i] from right]. Then result[i] = leftProduct[i-1] * rightProduct[i+1]
+
+221 - Maximal Square: Find max area of square formed by 1's
+    dp[i][j] = side length of the maximum square whose bottom right corner is the cell with index (i,j) in the original matrix.
+    dp[0][j], dp[i][0] = matrix[i][j]
+    dp[i][j] = 1 + min((dp[i][j - 1], dp[i - 1][j], dp[i - 1][j - 1])
+
+764 - Largest Plus Sign: Find the ORDER of plus sign formed by 1's
+    Fisrt build the grid with input and a grid with same size hold the data in four directions for each position in the grid. Then from each direction, fill the data grid:
+        left to right -> data[i][j].left
+        right to left -> data[i][j].right
+        top to bottom -> data[i][j].up
+        bottom to top -> data[i][j].down
+
+    Finally, go over the data grid again. Order of plus sign at i, j is min(left, right, up, down). Find the max order.
+
+========================================================================================
+
+- Math
+- Greedy
+- String 
+- Array
+- Matrix
+- Linked list
+- Bits
+- Tree and graph
+- Search
+- Sort
+- Sum
+- DP
+
+481 - Magical string: s contains one 1 and 2. # of contiguous occurrences of characters generates s itself. 
+    Init s = "122", occ = "12", charToAdd = "1"
+    To let occ generate s, first append the corresponding digit in s to occ. Then append 1 or 2 charToAdd to s. Toggle charToAdd for next round
+    To optimize, make all of the above global variables. Only generate s when going forward. If n < s.count then just use s[0..<n] to give the answer.
+
+--------Math--------
+
+31 - Next permutation
+    1. Find the largest (search backwards) index k such that nums[k] < nums[k + 1]. If no such index exists, the permutation is sorted in descending order, just reverse it to ascending order and we are done. E.g. the next permutation of [3, 2, 1] is [1, 2, 3].
+    2. Find the largest (search backwards) index l greater than k such that nums[k] < nums[l].
+    3. Swap the value of nums[k] with that of nums[l].
+    4. Reverse the sequence from nums[k + 1] up to and including the final element nums[nums.size() - 1].
+    This algorithm already handles duplicates
+
+469 - Convex polygon: 判断是否为凸多边形
+    For each vertex v(i), find the normal vector (cross product) of vector v(i)->v(i+1) and v(i+1)->v(i+2). If all the normal vectors have the same sign (some can be 0) on z direction, it is a convex polygon 
+
+    Cross product: v1 x v2 = (y1z2 - y2z1)i - (x1z2 - x2z1)j + (x1y2 - x2y1)k 
+
+356 - Line reflection: find if there is such a line parallel to y-axis that reflect the given set of points.
+    首先我们找到所有点的横坐标的最大值和最小值，那么二者的平均值就是中间直线的横坐标，或者求所有横坐标的平均值也可得出分割线横坐标
+    然后我们遍历每个点，build a map for [y: Set_of_x]. Ignore any points on the reflection line. 如果都能找到直线对称的另一个点，则返回true，反之返回false
+
+50 - pow(x, n)
+    n == 0 => 1
+    n < 0 => 1 / pow(x, -n)
+    if n % 2 == 0 { return myPow(x, n / 2) ^ 2 }
+    else { return x * myPow(x, n / 2) ^ 2 }
+
+357 - Count numbers with unique digits
+    f(0) = 1
+    f(1) = f(0) + 9
+    f(2) = f(1) + 9 x 9
+    f(3) = f(2) + 9 x 9 x 8
+    f(4) = f(3) + 9 x 9 x 8 x 7
+    ...
+    There's at most 11 answers.
+
+--------Greedy--------
+
+134 - Gas stations
+    Two theorems to solve this problem:
+    1. If gas sum > cost sum, we know there is solution. From note, there's only one solution.
+    2. If from i cannot reach x then any place between i and x cannot reach x. So the next try can start from x instead of i + 1. This enable us to only use O(n) time.
+
+    Let i be start position and j be the offset travels from i. Each round we start from i + j. If gasLeft < 0 then x = i + j and next i = x = i + j.
+
+406 - Queue Reconstruction by Height: each element is (person_height, num of people in front of this person who have a height greater than or equal to h). Reorder to satisfy the list
+    按照h降序排序，但是如果h相等则按照k升序排序．然后开一个新数组，因为数组按照降序排序，所以每次只需要将元素插入到新数组的k的位置即可．时间复杂度O(n*2)，
+
+--------String--------
+
+340 - Find length of longest substring with at most k distinct chars
+    Use a sliding window to scan s and a hash table to track count of chars in the window. Move right edge when # distinct chars <= k. Otherwise move left edge.
+
+482 - License key formatting: add dash(-) after every k characters. Only first segment is allowed to be shorter than k chars.
+    Scan the string backwards. Ignore any dashes in input string. After every k chars append a dash to result string. Finally check and remove if last char is a dash. Return reversed result string.
+
+418 - Sentence screen fitting: find how many times a sentence can be fitted on a screen.
+    Use a ptr to scan the sentence. For each row on screen, find how many words can be fitted into row. Reset the ptr and increment count when finished displaying the full sentence.
+
+616 - Add bold tag in string: Wrap any substring in dict with bold tag. Combine tag if substrings are connecting or overlapping.
+    Have a bool array recording if each char in s should be bold. For each char, if there's a dict word start at here, mark each char in this word as bold. 
+    Finally go thru the bool array and add bold tag around each block of bold chars.
+
+394 - Decode String: e.g. s = "3[a2[c]]", return "accaccacc".
+    First have a util func find the matching close brackets using a count. count++ when see "[" and count-- when see "]"
+    For each digit seen, first find it's next "[". (number can have multiple digits). Then find the matching "]". Recursively decode the content between brackets and append proper copies to result. Move index beyond the close bracket
+    If not a digit, means it's a simple letter, append it to result and increase index.
+
+247 Strobogrammatic numbers 2: find numbers looks the same as up side down of length n
+    翻转之后和自身相等有0, 1, 8, 在n为奇数的情况下最里面的一个数可以为这三个数的任意一个
+    外边就一次给两端添加一个对称的字符: 11, 69, 88, 96
+    如果是最外层的话需要注意不能是为0.
+
+484 - Find permutation: a string of D's and I's describing the relationship of consecutive numbers. 
+    Example: D D D D I I D D I
+         => 5 4 3 2 1 6 9 8 7 10
+    First have a sequence from 1 to n + 1. Then only numbers around D's needs to be reversed. Count # of consecutive D's and reverse the subsequence
+
+288 - Unique word abbreviation: abbr = first char + count of chars in middle + last char. Find if given word's abbr is unique in dictionary
+    Build a dict of [word_abbr: [words]] for the given dictionary. Then if dict[abbr] == nil || (dict[abbr]!.count == 1 && that abbr is from current word), return true
+
+166 - Fraction to recurring decimal
+    Use a map to store the remainder and the position. If we see the same remainder again, means there is a loop. So insert left parenthesis to prev same remainder's location and append right parenthesis. 
+    Pay attention to the sign as the sign of remainder is not always the same with final result.
+
+249 - Group shifted strings: group strings belong to same shifting seq. Means the distance between consecutive char in a string is the same with anothe string.
+    使用hashmap，关键字key为首个字符串相邻元素的差值和，如果差值为负数，则加上26， 
+        E.g.    "abc" -> b - a = 1, c - b = 1 -> "1,1"
+                "ba" -> a - b + 26 = 25 -> "25"
+                single character -> ""
+    这样，shifted字符串的关键字key相同。
+
+--------Array--------
+
+163 - Missing ranges
+	First check distance between lowerBound and array. Then go thru the sorted array, insert missing range if consecutive two nums apart more than one. Finally check last element and upperBound.
+
+729 - My calendar 1 (range)
+    Maintain the existing events as an array of ranges. The new event should not overlap with any existing events. O(n) to book a event
+
+731- My calendar 2: no tripple booking
+    Maintain an array of existing events and another array of double-booked ranges. If a new event overlap with any of double-booked range return false. Else add that event and update the double-booked ranges. O(n) to book a event
+
+280 - Wiggle Sort: reorder array in-place such that nums[0] <= nums[1] >= nums[2] <= nums[3]...
+    遍历一遍数组, 如果是奇数位置并且其值比下一个大,则交换其值, 如果是偶数位置并且其值比下一个小, 则交换其值. 时间复杂度是O(n)
+
+503, 739 - Next greater element 2
+    Use the stack to store the index of elements seen so far. When traverse from end of array, for each #, first pop from stack until stack top > current #. Stack top is the next greater # of current #. If stack is empty then next greater # is -1. Push current # into stack before moving backwards to next #.
+    Need to repeat this process twice as the array is circular.
+
+348 - Design Tic Tac Toe
+    Naive solution: O(n^2) for each move
+    Follow up: O(1) each move. 我们建立一个大小为n的一维数组rows和cols，还有变量对角线diag和逆对角线rev_diag，这种方法的思路是，如果玩家1在第一行某一列放了一个子，那么rows[0]自增1，如果玩家2在第一行某一列放了一个子，则rows[0]自减1，那么只有当rows[0]等于n或者-n的时候，表示第一行的子都是一个玩家放的，则游戏结束返回该玩家即可，其他各行各列，对角线和逆对角线都是这种思路
+
+444 - Sequence Reconstruction
+    - 问这些子序列能否唯一的重建出原序列。能唯一重建的意思就是任意两个数字的顺序必须是一致的，不能说在一个子序列中1在4的后面，但是在另一个子序列中1在4的前面，这样就不是唯一的了。而且任意两个相邻数字的顺序都必须确定.
+    - 还有一点就是，子序列seqs中不能出现其他的数字，就是说必须都是原序列中的数字。
+    - 我们可以用了hash map来记录原序列中每个数字对应的位置，然后用verified来标记符合条件的当前数字和其后面一个数字和org中的顺序一致，避免重复验证
+    - 用count来标记还需要验证顺序的数字的个数，初始化count为n-1，因为n个数字只需要验证n-1对顺序即可，
+    - 我们先遍历一遍org，将每个数字的位置信息存入map中，
+    - 然后再遍历子序列中的每一个数字，还是要先判断数字是否越界，然后我们取出当前数字curr，和其后一位置上的数字next，如果在org中，curr在next之后，那么直接返回false。否则我们看如果curr的顺序没被验证过，而且next是在curr的后一个，那么标记curr已验证，且count减1，最后如果count为0了，说明所有顺序被成功验证了
+
+370 - Range addition
+    只更新开头结尾两个数字就行了，创建一个长度为length+1的数组，在每个range开头坐标位置加上inc，而在结束位置加1的地方加上-inc，那么根据题目中的例子，我们可以得到一个数组，nums = {-2, 2, 3, 2, -2, -3}，然后我们发现对其做累加和就是我们要求的结果result = {-2, 0, 3, 5, 3}
+    Example: length = 5, updates = [[1, 3, 2], [2, 4, 3], [0, 2, -2]]
+    Idea is convert ranges into sum. Mark the first element to +inc means all #s from this # needs to +inc. And all #s from last+1 does not change
+
+487 - Max Consecutive Ones 2 in binary array
+	Only traverse the array once. Use oneCount to record consecutive one count. When hit 0, first res = oneCount + prevOneCount. Then still increment oneCount, then update prevOneCount and reset oneCount. Pay attention to order of operations.
+
+522 - Longest Uncommon Subsequence 2
+	The optimal Longest uncommon subsequence (if it exists) is always going to be the length of some string in the array. (why?)
+	Sort the strings in the reverse order. 
+	For each non-duplicate string, check if the string is a subsequence of all the strings longer than (before) itself. If it's not, that is the answer.
+
+667 - Beautiful arrangement 2: the list is [a1, a2, a3, ... , an], then the list [|a1 - a2|, |a2 - a3|, |a3 - a4|, ... , |an-1 - an|] has exactly k distinct integers.
+    - When k = n-1, a valid construction is [1, n, 2, n-1, 3, n-2, ....]. One way to see this is, we need to have a difference of n-1, which means we need 1 and n adjacent; then, we need a difference of n-2, etc.
+    - When k = 1, a valid construction is [1, 2, 3, ..., n]
+    - Combine the above two construction, first sequence [1, 2, ... , n-1-k] satisfies n1 = n-1-k, k1 = 1. Second sequence [n-k, n, n-k+1, n-1, ... ] satisfies n2 = k+1, k2 = k-1. 
+    - For second part, start with head = n-k and tail = n. Terminate condition is while head <= tail && result.count < n
+
+--------Matrix--------
+
+531 - Lonely Pixel 1
+	可以记录下每个黑点的位置，以及每行、每列出现的黑点的个数。然后遍历每个黑点，如果发现它所在的行和列的黑点数都为1，那么它就是孤立黑点了。
+
+533 - Lonely Pixel 2
+	Still use rows and cols array but each element become an array
+    rows[i] = array of j such that picture[i][j] are blacks
+    col[j] = array of i such that picture[i][j] are blacks
+	Use a hash map to count the identical rows. The key is the string of a row and the value is a collection of same rows.
+	After traverse the matrix once we can use the above information to get answer.
+
+498 - Diagonal traverse matrix
+    Example: for a 3x3 matrix, traverse order [0, 0], [0, 1], [1, 0], [2, 0], [1, 1], [0, 2], [1, 2], [2, 1], [2, 2]
+
+    Walk patterns:
+    If out of bottom border (row >= m) then row = m - 1; col += 2; change walk direction.
+    if out of right border (col >= n) then col = n - 1; row += 2; change walk direction.
+    if out of top border (row < 0) then row = 0; change walk direction.
+    if out of left border (col < 0) then col = 0; change walk direction.
+    Otherwise, just go along with the current direction.
+    Time complexity: O(m * n), Space complexity: O(1).
+
+54 - Spiral matrix: traverse matrix spirally from outside to inside
+    Set rowL/H and colL/H as bounds on four sides. Use direction % 4 to calculate current direction. Use count to track how many elements traversed.
+    Out of right bound (col > colH): col = colH; row += 1; direction += 1; rowL += 1
+    Out of bottom bound (row > rowH): row = rowH; col -= 1; direction += 1; colH -= 1
+    Out of left bound (col < colL): col = colL; row -= 1; direction += 1; rowH -= 1
+    Out of right bound (row < rowL): row = rowL; col += 1; direction += 1; colL += 1
+
+562 - Longest line of ones in matrix
+    没有什么好的技巧，逐行找，逐列找，然后正对角线找，反对角线找。算法的时间复杂度是O(mn)，空间复杂度是O(1)，其中m和n分别是矩阵的行个数和列个数。
+    Find diagonal has two parts. Use increasing xStart and yStart for each diagonal line.
+
+--------Linked List--------
+
+369 - Plus one linked list: plus 1 to the integer represented by linked list. consider the case like 99 -> 100
+    Use two pointer, j to travel the linked list, i to track the last non 9 digit position.
+    If i != nil after traversal, add 1 to i, and set the rest digits 0.
+    If i == nil after traversal, all list elements are 9's. append 1 to front of list and set every element to 0
+
+353 - Design snake game
+    设计一个贪吃蛇游戏, 给定了长宽初始位置和食物位置, 并且每次给一个移动方向的指令. 可以用一个doubly linked list来保存当前蛇身体所占的位置, 每次往队列中添加当前位置并且删除队首元素. 还需要判断的是当前位置是否到达边界和是否撞到了自身, 为了做这个判断可以用一个hash表来同样存储映射一下蛇身体所占的位置, 这样做的好处是无论是添加删除还是判断都可以在O(1)时间复杂度内完成.
+
+    有一个需要注意的是当吃掉一个食物之后长度虽然增加了, 但是并不是即刻反应的, 也就是说如果当前一步吃掉了食物, 但是他所占的位置还没有增加, 因为你不知道应该把长度添加在哪里. 所以需要一个标记, 在下一个指令给出的时候蛇的尾巴不移动, 只在移动方向上把这个长度加上.
+
+382 - Linked list random node (similar to 398)
+    For every node, increase count by 1, then test random(count) == 0. If true then use curr node. Otherwise keep the old node. Both options has the chance of 1 / count
+    For ith item, prob of choose i is 1/i, prob of keep old node is 1 - 1/i
+
+--------Bits--------
+
+393 - UTF-8 validation
+    First convert array to binary octet sequence with String.init(_ i: Int, radix r: Int) and pad with 0 if less than 8 bits. Then for each char (can have multiple bytes), first validate # of bytes. Then for each byte, verify it starts with "10"
+
+318 - Max product of word length (bit operation): find the maximum value of length(strings[i]) * length(strings[j]) where the two strings do not share common letters
+    1. Turn each string into a 26-bit binary number with LSB = string.contans("a") and MSB = string.contains("z"). Then for every string pair we can know if they share any character by testing num1 & num2 == 0 in O(1)
+        for c in word {
+            i |= 1 << (c.ascii! - 97)
+        }
+    2. (prunning) We can further optimize by sort the input words from longest to shortest. Then in each round we can stop after find first pair of words without same character.
+    3. (prunning) Also, since words from longest to shortest, if (words[i].length)^2 is less than max length so far, no need to continue with current i because all words following i will be shorter than words[i]
+
+397 - Integer replacement: minimum number of replacements needed for n to become 1?
+    Removing bits (divide by 2) is the fastest way. So even number is better than odd
+    If odd, compare # of 1's of n-1 and n+1 in binary form. If n-1 has less 1's, choose n-1. 
+    Or when n = 3, always do n - 1
+    Otherwise do n + 1, even n-1 and n+1 has same # of 1's. Consider example 1011 - 1 = 1010 and 1011 + 1 = 1100. Second way is better.
+    As a result: 
+        If n is even, halve it.
+        If n=3 or n-1 has less 1's than n+1, decrement n.
+        Otherwise, increment n.
+
+--------Tree--------
+
+297 - Serialize Deserialize binary tree
+    Serialize: level order traversal including the nulls under the leaf. Then remove the nulls at the end.
+    Deserialize: Build tree from an array. recursively call build tree on the child nodes.
+
+543 - Diameter of binary tree
+    For any node, the max diameter = max path in its left subtree + max path in its right subtree. Recursively calculate max distance to leaf in left/right subtree at every node to find the max diameter.
+
+298 - Binary tree longest consecutive (increasing) sequence
+    Recursively check if left and right children is increasing by one. Record the max length of increasing sequence.
+
+549 - Binary tree longest consecutive sequence 2 (dfs)
+    Longest consecutive seq at some node must equal to a decreasing seq (top down) on one side and an increasing seq (top down) on the other side. Calculate length of longest inc/dec seq at each node can get the solution.
+    递归求解以root为根节点向子节点方向（parent-child）的路径中，最大连续递增路径长度inc，以及最大连续递减路径长度dec. 最大连续路径长度=inc + dec + 1
+
+    var (incL, decL) = dfs(root.left!)
+    if root.left!.val - 1 == root.val { dec = max(dec, decL) }
+    if root.left!.val + 1 == root.val { inc = max(inc, incL) }
+
+    var (incR, decR) = dfs(root.right!)
+    if root.right!.val - 1 == root.val { dec = max(dec, decR) }
+    if root.right!.val + 1 == root.val { inc = max(inc, incR) }
+
+230 - Kth smallest element in BST
+    Inorder traversal with a count. if count == k that's the kth smallest element.
+
+173 - BST iterator: return next smallest element in the bst
+    Create a pushLeft func that push the left subtree of current node into a stack so the smallest node will be on top of stack. Every time after pop, check if the new top has a right child. Call pushLeft on the right child. Keep do this until stack is empty
+
+652 - Find duplicate subtree
+    Preorder or postorder traversal. At each node, recursively encode the subtree rooted at this node into a comma separated string. null is encoded as a special char.
+    Use a map to record the # of each subtree. Only record the node if the # of subtree is 2 to avoid duplicated results.
+
+545 - Boundary of binary tree
+	这道题给了我们一棵二叉树，让我们以逆时针的顺序来输出树的边界，按顺序分别为左边界，叶结点和右边界。题目中给的例子也能让我们很清晰的明白哪些算是边界上的结点。那么最直接的方法就是分别按顺序求出左边界结点，叶结点，和右边界结点。那么如何求的，对于树的操作肯定是用递归最简洁啊，所以我们可以写分别三个递归函数来分别求左边界结点，叶结点，和右边界结点。
+	根据题目条件, 首先判断root是否有左/右child, 如果没有那么左/右边界即是root自身.
+
+--------Graph--------
+
+261 - Graph valid tree: graph is a tree if it's connected and acyclic. Also, # of edge = # of nodes - 1.
+    Directed: Build graph and find root (only out going edges, should only get one.). Then perform cycle detection with dfs. Pay attention to push and pop visited nodes.
+
+    Undirected: Build graph. Then perform cycle detection with 'from' side of each edge. i.e. do not go to the neighbor where comes to the current node.
+
+685 - Redundant Connection 2 (dfs cycle detection)
+    Two cases to consider:
+    1. If the graph has cycle then remove the last edge that form the cycle
+    2. If the graph does not have cycle, there must be a node have to inbound edges. Remove one of them in the specified order.
+
+    - To find candidate edges in case 2, keep track # of parent for each node.
+    - Use dfs to detect cycle in directed graph. Pay attention to push/pop visited set.
+    - To determine the start node of dfs, if there's a node with outbound edges only (true root) then use it. Otherwise, choose the node that has most # of outbound edges (possible root)
+
+399 - Evaluate Division (graph + dfs): find the division chain
+    For each A / B = k, insert edges A - k -> B and B - (1/k) -> A into graph. 
+    For each query, do dfs from A see if can find B in graph.
+
+332 - Reconstruct Itinerary
+    Problem is equivalent to find the Eulerian path with Hierholzer's algorithm. First keep going forward until you get stuck (i.e. there's not available outgoing edge at some node). Then backoff and visit other edges of the second last node in the current path. Writing down the path backwards when retreating from recursion.
+
+    To achieve the lexical order, use a min heap to store the destination of each flight for each departure -> O(nlogn)
+
+    After build the graph, to traverse the graph, first loop thru all neighbors of current node and recursively visit them. After the loop, insert current node to front of result array.
+        while let heap = graph[airport], heap.count > 0 {
+            visit(heap.removeMin()!.val)
+        }
+        result.insert(airport, at: 0)
+
+133 - Clone undirected graph
+    First use bfs to clone all nodes. Build a dict of [orig_node: clone_node]. Then go thru each pair of nodes to build edges in cloned graph.
+
+--------Search--------
+
+42 - Trapping rain water
+    Use two ptrs l, r start from left and right. lMax, rMax be the max height so far from left/right
+    while l < r {
+        leftMax = max(leftMax, height[l])
+        rightMax = max(rightMax, height[r])
+        if leftMax > rightMax {
+            trappedWater += rightMax - height[r]
+            r -= 1
+        } else {
+            trappedWater += leftMax - height[l]
+            l += 1
+        }
+    }
+    Think about how to explain!!!
+
+240 - Search 2d matrix 2: search in sorted matrix (binary search)
+    For each row, if target can be in this row, do a binary search.
+
+162 - Find peak element (binary search): find first element that is greater than its next element
+    while l < h {
+        var mid = (l + h) / 2
+        if nums[mid] < nums[mid + 1] {
+            l = mid + 1
+        } else {
+            h = mid
+    }   }
+
+351 - Android unlock pattern (dfs)
+    0. The android unlock pad is a fixed 3x3 grid
+    1. Create 10x10 matrix. jumps[i][j] = # in middle of i and j
+    2. A helper function loop thru 1 - 9. For each unvisited number, if no jump between it and curr, or the jump in middle of it and curr is already visited, recursively dfs from that number with pathCount + 1
+    3. Because of symmetry, start from 1, 3, 7, 9 yields same # of paths. Start from 2, 4, 6, 8 yields same # of paths. So only call dfs for one from each group and finally call dfs on 5.
+
+294 - Flip Game 2 (dfs)
+    For each ++ in the string, recursively call canWin with that ++ replaced with --. Complexity is O(n^n)
+
+286 - Walls and gates (dfs): wall = -1, gate = 0, empty room = Int.max. Fill each empty room with the distance to its nearest gate
+    Recursion need to stop when rooms[i][j] == -1 (wall) or rooms[i][j] < curr_dist (there's already a shoter path)
+    Loop thru the rooms grid, only call dfs if rooms[i][j] == 0
+
+524 - Longest word in dictionary thru deleting
+    Go thru the words and find the longest word w such that w is a subsequence of s
+
+505 - The maze 2 (dfs): find if the ball in maze can stop at a given location. 
+    Use dfs to find all possible routes the ball can go and see if it can stop at the location. 
+    At each step of dfs, the ball either move forward by 1, or choose the next possible location when hitting a wall. Use a separate stop matrix to record every hit (where the ball can stop)
+    Initially call dfs on 4 directions. After each dfs, check if ball can stop at destination and find the min distance travelled.
+
+323 - # of connected components in undirected graph (dfs)
+    Similar to 200 - # of islands
+    dfs for each node and mark them as visited. # of components + 1 for each dfs
+
+320 - Generalized abbreviation (dfs): word -> ["word", "1ord", "w1rd", "wo1d", "wor1", "2rd", "w2d", "wo2", "1o1d", "1or1", "w1r1", "1o2", "2r1", "3d", "w3", "4"]
+    1. nextResult = dfs(String(s.dropFirst()))
+    2. nextResult.flatMap {
+        array of non-transformed string and transformed string
+        For transformed string, combine all numbers start from current position
+    }
+
+22 - Generate Parentheses (dfs)
+    At each position, result = left/right parenthesis + rest of solution. At any point of time, # of right parenthesis <= # of left parenthesis
+
+638 - Shopping offers (dfs)
+	First calculate the price without using any offer. Then for each special offer, calculate the needs after using this offer. If this offer can be used then its price is the offer price + recursively call the methods on the new needs. Keep the min price as the final result.
+
+756 - Pyramid Transition Matrix (dfs)
+    First build a 3d map to store all allowed strings. Then for each bottom level, build all its possible next level. Recursively test each next level. If one of them can reach level 1 then we can stack to the top.
+    Note we need two dfs functions. One builds the next level 2d char array from allowed map. The other builds all possible next level strings.
+
+542 - 01 matrix (bfs): find the distance of the nearest 0 for each 1
+    Keep a queue of (row, col, distance), q to maintain the queue of cells to be examined next and its distance.
+    We start by adding all the cells with 0s to q.
+    Initially, distance for each 0 cell is 0 and distance for each 1 is INT_MAX, which is updated during the BFS.
+    Pop the cell from queue, and examine its neighbors. If the new calculated distance for neighbor {i,j} is smaller, we add {i, j, dist} to q and update result[i][j].
+
+310 - Min height trees from undirected graph (bfs): find root
+    Start from each leaves, keep remove leaves of the graph until there's one or two nodes left
+
+--------Sort--------
+
+360 - Sort transformed array: array transformed with a quadratic function
+    First get the transformed array. Then if a > 0, parabola concave up, find largest value by comparing elements from two end. If a < 0, parabola concave down, find smallest value by comparing elements from two end.
+
+--------Sum--------
+
+560 - Subarray sum equals k: find the total number of continuous subarrays whose sum equals to k.
+	Use a hash map to record earlier cumulative_sums and their count. Every time we see a sum, if map[sum - k] also exist, then there are map[sum - k] new subarrays that sums to k. 
+	Notice our map need has map[0] = 1 for any first m items sums to k. 
+
+259 - 3 sum smaller: find how many triplets has sum less than target.
+    首先对数组进行排序. 然后同样是先确定一位, 然后双指针一个在最左边, 一个在最右边. 如果三个数的和小于target, 也就是nums[i]+nums[left]+nums[right] < target, 那么nums[i]+nums[left]+在区间[left+1, right-1]之间的所有数一定<target, 因为这个区间的数都小于nums[right], 所以一次可以得到几个组合方式, 也就是right-left个答案. 然后再让left++, 继续做即可. 注意到这个之后就可以很容易得到答案. 时间复杂度O(N^2).
+    E.g. in [-2, 0, 1, 3], if [-2, 0, 3] < target then  [-2, 0, 1] also < target
+
+--------DP--------
+
+583 - Delete operation for two strings: find the minimum number of deletions to make two words the same
+	Longest common subsequence problem
+    dp[i][j] = length of longest common subsequence for first i chars in word1 and first j chars in word2
+    At some i, j, if two chars are equal then dp[i][j] = 1 + dp[i - 1][j - 1]. Otherwise dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    do not use dp[i][j] = lcs of word1[0...i] and word2[0...j] because then you need to fill dp[0][0], dp[0][1] and dp[1][0] for initial condition.
+
+361 - Bomb enemy (dp)
+    Create a data grid records how many enemy can be hit at each position horizontally and vertically. For each row/column, record the last wall, for each wall discovered, update enemy count between it and last wall and reset enemy count. Finally traverse thru the data grid and find the max sum of horizontal + vertical
+
+279 - Perfect squares (DP)
+    dp[i] = least # of perfect squares for i
+    init: dp.count = n + 1, dp = [0, 1, Int.max, Int.max, ...]
+    progress: for each i, var j = 1
+            while j * j <= i {
+                dp[i] = min(dp[i], 1 + dp[i - j * j]); j += 1
+            }
+    Result is dp[n]
+
+313 - Super ugly number: get nth super ugly number with the given list of prime #s
+    The next ugly number is prime[i] multiply some existing ugly number. 
+    dp solution. At each round figure out the next smallest ugly number among primes[i] * ugly[idx[i]]. Then update the idx array
+    idx[i] records the index of ugly # such that prime[i] * ugly[idx[i]] > ugly.last > any of current ugly #s. idx help remove duplicate multiplications by getting ready to generate the next ugly # for each prime #.
+    
+486 - Predict the winner: larger sum of picked # wins
+    dp[i][j] = how much more scores that the first-in-action player will get from i to j than the second player
+    init: dp[i][i] = nums[i]    // there's only one # taken by first player
+    prog: dp[i][j] = max(nums[i] - dp[i+1][j], nums[j] - dp[i][j-1])
+    // nums[i] - dp[i+1][j]: 1st player pick nums[i], dp[i+1][j] = scores 2nd player get more than 1st player
+    result: dp[0][n - 1]
+
+368 - Largest divisible subset: any # in subset is divisible by another #
+    1. Sort
+    2. Find the length of longest subset end at nums[i]: 
+        for every nums[j] in i-1...0 that can be divided by nums[i], dp[i] = max(dp[i], dp[j]+1)
+    3. Record the largest dp[i] of it.
+    4. Do a loop from the largest element to nums[0], add every element belongs to the longest subset. Each divisible i causing dp[i] to increase is in the longest subset
+
+474 - Ones and zeros
+    dp[i][j] = max # of strings can pick with i zeros and j ones.
+    init: dp[i][j] = 0, size = dp[m + 1][n + 1]
+    prog: dp[i][j] = max(dp[i][j], 1 + dp[i - zeroCount][j - oneCount])
+    res: dp[m][n]
+
+583 - Delete operation for two strings (longest common subsequence)
+	dp[i][j] = length of longest common subsequence for first i chars in word1 and first j chars in word2
+	At some i, j, if two chars are equal then dp[i][j] = 1 + dp[i - 1][j - 1]. Otherwise dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+	Do not use dp[i][j] = lcs of word1[0...i] and word2[0...j] because then you need to fill dp[0][0], dp[0][1] and dp[1][0] for initial condition.
+
+377 - Combination sum 4. Find all combinations add up to a target. Numbers can be reused.
+    dp[i] = # of ways add up to i. dp.count = target + 1
+    init: dp[i] = 0
+    prog: for each i, for each number, if number == i then dp[i] += 1. else dp[i] += dp[i - num]
+
+10 - Regular Expr Matching (DP)
+    Related problem: 44
+    string s and p, p contains "." or "*". "a*" means 0 or more a's. return if s, p matches.
+
+    dp[i][j] = first i chars in s and first j chars in p matches or not.
+    init: dp[0][0] = true. dp[i][0] = false. 
+        dp[0][j] if current char in p is "*", then look at dp[0][j - 2]
+    func: 
+        if curr char in p is "*", look at the char before * in p
+            if curr char in s == char before * in p
+                dp[i][j] = dp[i - 1][j] || dp[i][j - 2]
+                        abcdd..., abcd* || abc, abcd*
+        else if current char in s == current char in p
+            if equal (curr char of p could be "."), dp[i][j] = dp[i - 1][j - 1]
+        else dp[i][j] = false
+
+--------Other Data Structure--------
+
+535 - Encode Decode Tiny Url (hash map)
+	将长短链接进行一一映射. 我们可以使用两个Map来分别保存，
+	Each url has an index k. k increment for every new url. Map1 = [longUrl: k], map2 = [k: longUrl].
+	Encode: A string s contains all upper, lower case letters and numbers, length is 62. Keep appending s.charAt(k % 62) to shortUrl until k == 0
+	Decode: k = 0. For each char in shortUrl backwards, k = k * 62 + s.indexOf(char)
+
+373 - Find K pairs with smallest sum from two arrays (min heap)
+    Use a min heap to maintain K possible smallest pairs. first insert (n1[0], n2[0]), (n1[1], n2[0]), ... into heap. Then every time remove the smallest sum pair from the heap and insert the pair of same number in nums1 but next number in nums2 into the heap. E.g. after (n1[0], n2[0]) is removed, insert (n1[0], n2[1]) into heap.
+
+684 - Redundant Connection (union-find): find the edge that forms the cycle
+    Union find: first create the find function which handles:
+        - init parent to self when newly added, 
+        - recursively find parent 
+        - path compression. 
+    Then for each edge v1->v2, if two vertices have same parent then found a cycle and return that edge. Otherwise append the tree of v2 under root of v1
+
+676 - Magic Dictionary (hash map)
+    Build dict from words array: For each word, for each char, remove the char and put the rest of the word as key, a pair of (index of the removal, removed char) into the hash map
+    Search word: During search, generate the keys as in step 1. When we see there's pair of same index but different char in the value array, we know the answer is true
+
+402 - Remove K digits (stack)
+    First think about remove one digit: Remove first peak digit will give smallest number. Peak means first num[i] > num[i+1]
+    To remove K times, use a stack to store the digits. Once we found stack top is a peak digit, keep pop the stack until stack top is not a peak, or we already removed k times. E.g. 123450, k = 4 -> 10
+    Finally if k removal is not reached, remove from top of stack (end of num)
+
+331 - Verify preorder serialization of binary tree (stack)
+    Idea: keep replacing leaf (num##) into #, until the entire tree becomes #
+    E.g. 12456#####3## => 12456###### => 1245##### => 124#### => 12### => 1## => #
+    Optimize: Use a stack, push from left to right, pop each num## and push a # when seen. At the end the stack should only have a # left.
+
+451 - Sort chars by frequency (hash map + bucket): abcbcc -> cccbba
+    Count the occurrence of each char with hash map. Create a buckets array. buckets[i] = chars with i occurrence. Then append chars to buckets[i]. Finally get construct the result string from back of the buckets.
+
+380 - Insert Delete GetRandom O(1) (hash map)
+    Delete O(1) = Circular DLL. Get O(1) = HashMap
+
+    Insert: Use a dummy head. Every insert goes right after the head
+    Delete: Find node in hashmap then remove
+    GedRand: Generate a random number then dict.allKeys()[random]
+    
+208 - Implement Trie
+    A prefix tree with each node points to its parent. Root is a dummy node without any character. Parent of root is nil.
+        class TrieNode {
+            var value: Character
+            var parent: TrieNode?
+            var children: [Character: TrieNode]
+            var isTerminate: Bool
+        }
+
+    insert: traverse and add node if not exist. set the terminate flag on the last node to true.
+
+    contains/find: traverse the trie. If any of the node in the middle is missing, or the last node is not a terminating node. Return false.
+
+    remove: first traverse to the last node. then backtrack to remove, until following conditions
+        while curr.isLeaf() && !curr.isTerminate, let parent = curr.parent {
+            parent.children[curr.value] = nil
+            curr = parent
+        }
+
+==============================================
+Other problems
+
+（高频）带时间戳expiration的hashmap以及删除expired的entry
+有一堆task，有expiration time，比如1000ms之后expire。然后实现一个generic的hashmap，能
+够add task，get task（如果task已经expire，就delete）。这两个都实现了，最后要求加一个可以
+自动clean up没有被get过，但是已经expire的task
+应该可以用HashMap + DoublyLinkedList，类似LRU的做法。然后定期 ​从头遍历DLL，删除过期
+的entry from DLL & Map。
+如果对于所有task，experation是固定值的话，感觉也可以用circular array做，这样clean up会比
+较快，空间也比较节省
+
+
+（高频）汇率转换
+要写一个online的单位转换器，可以添加随时新的转换关系，e.g. 'USD' -> 'RMB' = 6.8, 'RMB' ->
+'JPY' = 10之类的，然后也要支持query，难点在于转换关系可以传递也可以逆转，所以就用了
+hashmap存adjacent list，然后讨论了应该在每次添加新的关系的时候遍历并且compress path因
+为config应该没有query的call频繁，小哥表示同意，就开始写两个API，path compression就用
+DFS做了
+类似LC399
+
+
+（高频）多少种走法in matrix
+给定一个矩形的长宽，用多少种方法可以从左上角走到右上角 （每一步，只能向正右、右上 或
+右下走）
+Two pass DP即可
+follow up：如果给矩形里的三个点，要求解决上述问题的同时，经过这三个点
+纵向切割矩形，一个一个地做DP，然后相加
+follow up：如何判断这三个点一个是合理的，即存在遍历这三个点的路经
+DP时看是否可达就好了呗
+follow up：如果给你一个H，要求你的路径必须向下越过H这个界，怎么做
+可以再做一次 dp，但是只走 <= H 的路径，再用总数减一下
+Follow up：要经过某些特定row怎么走？要先经过一个row再经过另一个row怎么走？
+也是矩阵切割的思想，但是要处理先后顺序
+
+
+（高频）长凳坐人问题
+有一张长凳一开始分散的坐着一些人，每个新来的都想坐在最宽敞的一段的中间位置，问：如何
+模拟这一过程
+follow up是如果有多个长凳该怎么办？以及如果长凳的数据太大，内存装不下又该怎么办？
+follow up: 凳子上一开始没有人，然后一个一个往里面放，每次放的时候O(1)时间求放在哪里距离
+最大（数学问题 )：优先队列，每次弹出最大的间隔，折半加入队列。
+这个问题实际就是[0, n)被分成了若干个intervals。可以将intervals加入PriorityQueue，每次新来
+人的时候，取出最长的interval，split成相等的两个intervals再入队列即可。
+对于Follow up，可以维护K个PriorityQueue，每次取出K个peek中最长Interval即可。
+数据量太大，那么存文件呗？
+
+
+（高频）扫地机器人
+Given a robot cleaner in a room modeled as a grid.
+Each cell in the grid can be empty or blocked.
+The robot cleaner with 4 given APIs can move forward, turn left or turn right.
+When it tries to move into a blocked cell,
+its bumper sensor detects the obstacle and it stays on the current cell.
+The 4 APIs are:
+- Void clean(): clean the current location.
+- Void turnleft(k=1): turn left k*90 degrees.
+- Void turnright(k=1): turn right k*90 degrees.
+- Boolean move(direction=None): move forward for 1 position, return False if that’s not
+possible.
+其中关于 `move` 这个 API 看到两个版本：一个是没有 parameter，每次就朝机器人面向的方
+向前进一步，所以需要自己在递归中维护方向；一个是可以传 direction 进去，让机器人直接朝
+那个方向走一步。
+OOD，要求实现API
+或者简单版本，要求用给定的API打扫完所有empty格子。
+
+    实现API
+    Room 负责记录实际的座标和 robot 的所在座标，用来判断 robot 是否撞墙，以及房间是不是已
+    经干净，简单来说这个 API 有上帝视角。
+    Robot 只记录 robot 面向的方向，以及跟 Room 说我要朝这个方向走，由 Room 返回有没有撞
+    墙。
+    具体实现其实不难，我只稍微提一下方位，和面经里的分享一样，我用了 0, 1, 2, 3 来代替方位，
+    这样做的好处是要转换方位只需要 `(i + k) % 4` 就行。python 里面能直接 `(i - k) % 4`，也可以直
+    接 `(i - k + 4) % 4` 先换成正数。
+
+    调用API打扫屋子（DFS + 手动维护方向）
+    手动维护方向稍微 tricky 一些，可以对照代码仔细思考以下这三句话。
+    - 进格子：举个实例吧，假设当前位于 O 格子，上下左右分别为 UDLR，那么我要往周围移动的
+    方向要顺着 DFS 的特点，D -> R -> L -> U（只要是十字形的移动就行，使得能够尽可能的直走
+    ，以及递归退回来的时候能面向进来时候的反向，比如 R -> U -> D -> L 也行）。
+    - 换方向：比如以下代码，是对应前一步进格子的 D，也就是往下走的部分 (在 robot_cleaner.py
+    的 L334-L338)
+    大白话就是，如果下方 (D) 没去过，而且没墙，就去 (DFS)，回来之后 (机器人面向上方) ​转右边
+    进去右方 (R)；如果不能去下方，那么 (机器人面向下方) 转左边进去右方。
+    - 出格子：要让递归返回的时候，Robot 刚好朝向进去格子的反方向(用前述十字形的移动)，如此
+    才能在递归完准备离开当前格子的时候调用 robot.move() 离开。
+
+
+（高频）找最大font fit sentence on screen
+已知screen的高和宽，给你最小和最大的fontSize，要求给定一个string，将string用尽可能大的
+fontSize显示在screen里。字符串如果是句子的话，单词不能被截断，要分配到下一行。
+已知两个API getHeight(int fontSize), getWidth(char c, int fontSize)，可以得到每个character在不
+同fontSize下的高和宽。
+和面试官交流后，确认string可以拆分成几行显示在screen中，先提出暴力解法，然后用二分法优
+化。
+可以将屏幕按照font的宽高换算成有多少rows * cols，然后用418. Sentence Screen Fitting的思路
+判断是否能装下一个字符串或者句子。
+上面这个作为binary search的条件，最终锁定满足条件的最大字体。（应该是返回right index）
+
+
+（高频）Maximum sum rectangle in a 2D matrix
+https://www.geeksforgeeks.org/dynamic-programming-set-27-max-sum-rectangle-in-a-2d-matrix
+
+枚举left col和right col，然后以row为单位进行DP。这里对每行计算presum加速。时间复杂度是
+O(n ^ 3)
+
+
+（高频）匹配自行车和人
+有很多自行车和很多人，如果完美匹配自行车和人，就是匹配最近的自行车和最近的人，至少有
+一个解，自己设计数据结构。
+这道题很开放，需要跟面试官积极交流，厘清条件。
+- 比如是人多还是自行车多？如果是人多、自行车少，那么从自行车出发做计算会比较高
+效。
+- 如果出现相等距离怎么办？例如自行车a到两个人x、y的距离相同，match谁呢？
+Solution 1: BFS
+我用图来存，然后我从自行车做bfs，碰到最近的人就assign。
+Solution 2: Greedy, HashMap + MinHeap
+我最后写的是一个比较简单的解法，假设函数给定一堆人和车以及他们的坐标，然后求出所有人
+车距离，把这些数值放在一个minh8eap里面，每次拿最小的距离，同时记录下来这个人和这个车
+已经match过了，这样依次匹配。这种解法的缺点是没考虑tie的情况
+之后follow up是如果有的时候很多人到同一辆车距离相同，怎么assign，要求全局最优，
+我理解的全剧最优就是让每个人走的路加起来和最小，这样找到一个解使得匹配之后所有人和车
+的距离之和是最短的。
+可以用Greedy，每次都match到最短的pair，但这种未必能确保达到最优解。
+或者可以用人为起点做了个bfs，然后得出<Node, distance>的preference list。然后做dfs，找出
+最短的distance之和。烙印说可以，不过没写代码。
+我问他还有什么更好的解法吗，他说有个汉密尔顿什么什么的算法
+
+
+（高频）找出单词里所有的extension
+Extension的定义是，有的人喜欢打字说heeeeloooo，hiiiii，给了个规则说相同字符连续超过三个
+就算是extension ​，找出一个string中所有的extension的start／end index，自己定义数据结构。
+Two-pointer，用个pair来存start index和end index。
+follow up是给你一个字典，字典中的单词都是不含extension的。然后给你一个单词，可能有
+extenstion可能没有，问去掉了extension的这个单词在不在字典里 ​。例如，输入是一个有很多
+extension的单词，比如heeellooo，hiiii，字典是［hello，hi，word］，问你输入的词精简后在不
+在字典里，比如heeellooo精简后可能是hello，所以在字典里，catttt精简后是cat或者是catt，不在
+字典里。
+对于follow up，因为exntesion的定义是连续超过三个字母，而又不可能把extension删的一个字
+母不剩，所以每个extension最后只会留下一个或两个字母 ​，所以把2^n个可能的情况穷举一遍就
+行了，或者动态规划也可以，令s为原字符串对所有extension只保留一位后的字符串，f[j][0..1]表
+示当前处理到s，在trie树上走到j节点，s重复过一次或两次。不过我觉得动态规划应该是想要的
+解法...感觉好复杂我的妈，要不还是DFS吧？
+
+
+（高频）Find string matching from stream
+给一个char stream, 有next(), 和hasNext(), 两个API。 给一些字符串作为目标字符串。要求每当
+char stream里出现目标字符串任何一个词，就打印这个词。
+比如目标 'abc, att, bba, bc, abce', 然后我们对char stream call next， 出来的一些char 是 t, a, b,
+c, e, t.... 我们需要打印 abc, bc, abce
+这个题如果把词典的word逆序后建Trie树 ​，再用一个vector存最近遇到的
+max_length_of_word_in_dict个char，每次来一个char就逆序构造string到Trie中查找
+反着建的话，从stream尾到stream头O(n)遍历一遍就能找到所有match到的词。从stream头到
+stream尾正着走的话，要考虑到每一个字符都作为match开头的情况，所以要检查O(n^2)次。
+例：
+stream里已有aabca，新来一个字符t，变成aabcat。
+字典里有"cat","bcat","aabcat"。
+反建trie的话得到t->a->c (isWord) ->b (isWord) ->a->a (isWord)。
+aabcat从后往前遍历一次在trie里就能找到所有词。
+
+
+（高频）Triangle array search
+定义是先increase后decrease，无duplicate，要求
+- 判断是否是triangle sorted：iteration O(n)
+- 找min：O(1)
+- 找max peak：binary search, O(logn)
+- 找target number：按照peak位置分成两半，然后二分，O(log n)
+变型题：有一个曲线，曲线的形状是先递减再增加，找曲线的最低点，如果只考虑int怎么做，如
+果考虑double怎么做
+考虑double的话返回一个range，包含target即可。

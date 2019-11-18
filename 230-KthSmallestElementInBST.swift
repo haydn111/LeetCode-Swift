@@ -38,6 +38,8 @@ func inOrder(_ node: TreeNode?) {
     if node == nil { return }
     inOrder(node!.left)
     count += 1
-    if count == k { kthNode = node; return }
+    if count == k { 
+        kthNode = node; return 
+    }
     inOrder(node!.right)
 }

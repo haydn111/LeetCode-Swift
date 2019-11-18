@@ -15,7 +15,6 @@
 // Assume you have a dictionary and given a word, find whether its abbreviation is unique in the dictionary. A word's abbreviation is unique if no other word from the dictionary has the same abbreviation.
 
 // Example: 
-
 // Given dictionary = [ "deer", "door", "cake", "card" ]
 
 // isUnique("dear") -> 
@@ -29,6 +28,11 @@
 
 // isUnique("make") -> 
 // true
+
+
+// Build a dict of [word_abbr: [words]] for the given dictionary. 
+// Then if dict[abbr] == nil || (dict[abbr]!.count == 1 && that abbr is from current word), 
+// return true
 
 class ValidWordAbbr {
     var table = [String: Set<String>]()    // dict of [word_abbr: [words]]
